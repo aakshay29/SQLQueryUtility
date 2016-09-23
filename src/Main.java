@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
@@ -22,10 +23,8 @@ public class Main {
 				writer.println(executeString(query));
 				writer.close();
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			System.out.println("Your data is stored in CustomerData.txt");
@@ -45,10 +44,17 @@ public class Main {
 			con = DriverManager.getConnection("jdbc:oracle:thin:ora1/ora1@localhost:1521:orcl");
 			stmt = con.createStatement();
 			rs = stmt.executeQuery(sql);
-			returnString += "FIRSTNAME LASTNAME\n";
-			returnString += "--------- --------\n";
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int columnsNumber = rsmd.getColumnCount();
+			for(int i = 1; i < columnsNumber+1; i++){
+				returnString += rsmd.getColumnName(i) + "        ";
+			}	
+			returnString += "\n";
 			while (rs.next()) {
-				returnString += rs.getString("FIRSTNAME") + " " + rs.getString("LASTNAME") + "\n";
+				for(int i = 1; i < columnsNumber+1; i++){
+					returnString += rs.getString(i) + "        ";
+				}
+				returnString += "\n";
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
